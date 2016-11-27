@@ -14,19 +14,25 @@ ap.add_argument("-s", "--starting", required=True,
 	help="starting folder location to extract folders")
 args = vars(ap.parse_args())
 
+
+word_results = open('wordresults.txt', 'a')
+word_results.write('wordlist of documents found in' + args['starting'])
 results = open('filelist.txt', 'a')
 results.write('-------------\n')
 results.write('filelist of ' + args['starting'] + '\n')
 files = 0
 for dirname, dirnames, filenames in os.walk(args['starting']):
 
-	if filenames:
-		for filename in filenames:
-			# print(os.path.join(dirname, filename))
+	for filename in filenames:
+		#print(os.path.join(dirname, filename))
 			# results.write(os.path.join(dirname, subdirname) + '\n')
-			if filename.endswith('.txt'):
-				results.write(os.sep.join([dirname, filename])	+ '\n')
-				files = files+1
-
-print('successfully found '+ str(files) + 'files in '+ args['starting'])
+		if filename.endswith('.txt'):
+			results.write(os.sep.join([dirname, filename])+ '\n')
+			fpath = os.path.join(dirname, filename)
+			f = open(fpath)
+			content = f.read()
+			files = files+1
+                                        
+print('Successfully found '+ str(files) + ' files in '+ args['starting'])
 results.write('# of files found'+ str(files))
+print('Words found in the documents: ' + '' + str(content))
