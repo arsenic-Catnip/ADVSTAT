@@ -15,10 +15,10 @@ ap.add_argument("-s", "--starting", required=True,
 	help="starting folder location to extract folders")
 args = vars(ap.parse_args())
 
-
-word_results = open('wordresults.txt', 'a')
+test_results = open('test.txt', 'a')
+word_results = open('wordresults.txt', 'r+')
 word_results.write('-------------\n')
-word_results.write('wordlist of documents found in' + args['starting'] + '\n')
+word_results.write('wordlist of documents found in ' + args['starting'] + '\n')
 # results = open('filelist.txt', 'a')
 # results.write('-------------\n')
 # results.write('filelist of ' + args['starting'] + '\n')
@@ -35,14 +35,26 @@ for dirname, dirnames, filenames in os.walk(args['starting']):
 			word_results.write("wordlist of " + fpath + ": \n")
 			f = open(fpath)
 			for line in f:
-				# print(line)
+				wordcount = {} 
 				list = line.split()
 				for word in list:
 					word_results.write(str(word) + "\n")
+
+					for words in f.read().split():	
+						if words not in wordcount:
+							wordcount[words] = 1 
+						else:
+							wordcount[words] += 1
+					for hatsune, miku in wordcount.items():
+						print(str(hatsune),str(miku))
+						test_results.write(str(hatsune))
+
+					
 			# content = f.read()
 			# word_results.write(content + "\n")
 			files = files+1
                                         
 print('Successfully found '+ str(files) + ' files in '+ args['starting'])
+
 # results.write('# of files found'+ str(files))
 # print('Words found in the documents: ' + '' + str(content))
