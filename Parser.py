@@ -19,14 +19,13 @@ args = vars(ap.parse_args())
 
 
 
-spamprob01 = open('spamlist01.txt', 'r+')
-safeprob01 = open('safelist01.txt', 'r+')
-spamprob02 = open('spamlist02.txt', 'r+')
-safeprob02 = open('safelist02.txt', 'r+')
+spamprob01 = open('spamlist01.txt', 'w+')
+safeprob01 = open('safelist01.txt', 'w+')
+spamprob02 = open('spamlist02.txt', 'w+')
+safeprob02 = open('safelist02.txt', 'w+')
+results = open('results.txt','w')
 same = open('same.txt', 'w')
 # Variables
-
-
 
 spm_mail01 = 0
 saf_mail01 = 0
@@ -39,25 +38,31 @@ spm_words = 0
 saf_words = 0
 
 safe_words01 = {}
-spam_words01 = {}
+ham_words = {}
+corpus = {}
+
 safe_words = {}
 spam_words = {}
+grineer = {}
 
 #THIS IS THE STARTING PATH
+#This function gets all the filenames that are inside the 'starting' directory
 for dirname, dirnames, filenames in os.walk(args['starting']):
 	for filename in filenames:
 		fpath = os.path.join(dirname, filename)
 		if "spmsga" in filename:
+			#this adds to the total spam file count
 			spm_mail01 += 1
 			f = open(fpath)
 			for line in f:
 				for word in f.read().split():
 					if word not in spam_words:
-						spam_words01[word] = 1
+						ham_words[word] = 1
 					else:
-						spam_words01[word] += 1
+						ham_words[word] += 1
 					spm_words01 += 1
 		else:
+			#This adds to the total safe mail count
 			saf_mail01 += 1
 			f = open(fpath)
 			for line in f:
@@ -68,16 +73,17 @@ for dirname, dirnames, filenames in os.walk(args['starting']):
 						safe_words01[word] += 1
 					saf_words01 += 1
 
-for word, count in spam_words01.items():
+
+for word, count in ham_words.items():
 	prob = count / spm_words01
 	result = '{:1.10f}'.format(prob)
-	formation = "{0} {1} {2}".format(str(word), str(count), str(result))
+	formation = "{0} " " {1} {2}".format(str(word), str(count), str(result))
 	spamprob01.write(formation + '\n')
 
 for word, count in safe_words01.items():
 	prob = count / saf_words01
 	result = '{:1.10f}'.format(prob)
-	formation = "{0} {1} {2}".format(str(word), str(count), str(result))
+	formation = "{0} " " {1} {2}".format(str(word), str(count), str(result))
 	safeprob01.write(formation + '\n')
 
 
@@ -110,35 +116,34 @@ for dirname, dirnames, filenames in os.walk(args['classify']):
 for word, count in spam_words.items():
 	prob = count / spm_words
 	result = '{:1.10f}'.format(prob)
-	formation = "{0} {1} {2}".format(str(word), str(count), str(result))
-	spamprob02.write(formation + '\n')
+	formation = "{0} " "  {1} {2}".format(str(word), str(count), str(result))
+	spamprob02.write(formation + "\n")
 
 for word, count in safe_words.items():
 	prob = count / saf_words
 	result = '{:1.10f}'.format(prob)
-	formation = "{0} {1} {2}".format(str(word), str(count), str(result))
-	safeprob02.write(formation + '\n')
-#COMPARISON Still doesn't work :/
-filespam1 = spamprob01.read().split(None, 1)
-filespam2 = spamprob02.read().split(None, 1)
-file1 = safeprob01.read().split(None, 1)
-file2 = safeprob02.read().split(None, 1)
+	formation = "{0} " " {1} {2}".format(str(word), str(count), str(result))
+	safeprob02.write(formation + "\n")
 
 
-for f2 in filespam1:
-	for f3 in filespam2:
-		if f2 in f3:
-			same.write(f2)
-for f4 in file1:
-	for f5 in file2:
-		if f4 in f5:
-			same.write(f4)
+#COMPARISON
+totals = spm_mail01 + saf_mail01
+totalc = spm_mail + saf_mail
+
+for value in ham_words:
+	value.strip('('')')
+	corpus[value] = ham_words[value]
+	for value2 in spam_words:
+		value2.strip('('')')
+		grineer[value2] = spam_words[value2]
+		for tech in corpus.items():
+			for lancer in grineer.items():
+				print(str(lancer))	
 
 
 
-
-print("found a total of " + str(spm_words) + " in " + args['starting'] + " within spam emails\n")
-print("found a total of " + str(saf_words) + " in " + args['starting'] + " within safe emails\n")
+results.write("found a total of " + str(spm_words) + " in " + args['starting'] + " within spam emails\n")
+results.write("found a total of " + str(saf_words) + " in " + args['classify'] + " within safe emails\n")
 spamprob01.close()
 safeprob01.close()
 spamprob02.close()
