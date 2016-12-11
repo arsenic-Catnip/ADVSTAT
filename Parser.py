@@ -147,7 +147,7 @@ for files in toclass:
 				else:
 					safe_prob *= 1 / (saf_mail01+total)
 			spam_prob *= spamclass_prob
-			safe_prob += safeclass_prob
+			safe_prob *= safeclass_prob
 			if spam_prob > safe_prob:
 				cspm_mail += 1
 			else:
