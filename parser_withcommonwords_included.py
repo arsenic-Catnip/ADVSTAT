@@ -63,12 +63,14 @@ for source in sources:
 	results.write(str(source) + "\n")
 	for dirname, dirnames, filenames in os.walk(source):
 		for filename in filenames:
+			print("one file source")
 			fpath = os.path.join(dirname, filename)
 			if "spmsg" in filename:
 				#this adds to the total spam file count
 				spm_mail01 += 1
 				f = open(fpath)
 				for line in f:
+					print("read one line - source")
 					for word in f.read().split():
 						if word not in spam_words and word not in common_words:
 							ham_wordcount[word] = 1
@@ -77,12 +79,14 @@ for source in sources:
 							ham_wordcount[word] += 1
 						elif word in common_words:
 							comword_wordcount[word] += 1
+							com_words01 += 1
 						spm_words01 += 1
 			else:
 				#This adds to the total safe mail count
 				saf_mail01 += 1
 				f = open(fpath)
 				for line in f:
+					print("read one line - source")
 					for word in f.read().split():
 						if word not in safe_words and word not in common_words:
 							safe_wordcount[word] = 1
@@ -91,23 +95,31 @@ for source in sources:
 							safe_wordcount[word] += 1
 						elif word in common_words:
 							comword_wordcount[word] += 1
+							com_words01 += 1
 						saf_words01 += 1
 
-		for word in spam_words:
-			for common in safe_words:
-				if word == common and common not in common_words:
-					spam_words.remove(common)
-					safe_words.remove(common)
-					comword_wordcount[common] = 0
-					comword_wordcount[common] += ham_wordcount[common]
-					del ham_wordcount[common]
-					comword_wordcount[common] += safe_wordcount[common]
-					del safe_wordcount[common]
-					common_words.append(common)
-				elif word == common and common in common_words:
-					comword_wordcount[common] += 1
+			print("creating common words list")
+			for word in spam_words:
+				for common in safe_words:
+					if word == common and common not in common_words:
+						spam_words.remove(common)
+						safe_words.remove(common)
+						comword_wordcount[common] = 0
+						comword_wordcount[common] += ham_wordcount[common]
+						del ham_wordcount[common]
+						comword_wordcount[common] += safe_wordcount[common]
+						del safe_wordcount[common]
+						common_words.append(common)
+					elif word == common and common in common_words:
+						spam_words.remove(common)
+						safe_words.remove(common)
+						comword_wordcount[common] += ham_wordcount[common]
+						del ham_wordcount[common]
+						comword_wordcount[common] += safe_wordcount[common]
+						del safe_wordcount[common]
+						comword_wordcount[common] += 1
 
-		com_words01 = len(common_words)
+			com_words01 = len(common_words)
 
 print("word list created!\n")
 # alltotal = spm_words01	#total number of words overall, no repetitions
@@ -153,6 +165,7 @@ results.write("classifying results:\n")
 for files in toclass:
 	for dirname, dirnames, filenames in os.walk(files):
 		for filename in filenames:
+			print("classifying one file")
 			results.write(str(filename) + "\n")
 			wordcount = {}			#dictionary of words found within the text; format 'word' - 5
 			total = 0				#total number of words found within the text w/o repetition
@@ -163,6 +176,7 @@ for files in toclass:
 				dspm_mail += 1
 				g = open(gpath)
 				for line2 in g:
+					print("read one line - classify")
 					for word in g.read().split():
 						if word not in words:
 							wordcount[word] = 1
@@ -179,23 +193,23 @@ for files in toclass:
 				zerosafe = 0  #number of words that did not exist as safe word
 				for word, count in wordcount.items():
 					if word in spam_words:
-						spam_prob *= (count+1) / (spm_mail01+(total*2))
-						ham_wordcount[word] += count
+						spam_prob *= (ham_wordcount[word]+1) / (spm_mail01+len(spam_words))
+						# ham_wordcount[word] += count
 					elif word in common_words:
-						spam_prob *= (count+1) / (com_words01+(total*2))
+						spam_prob *= (comword_wordcount[word]+1) / (com_words01+len(common_words))
 					elif word not in common_words and word not in spam_words:
-						spam_prob *= (count+1) / (spm_mail01+(total*2))
-						ham_wordcount[word] = count
+						spam_prob *= 1 / (spm_mail01+len(spam_words))
+						# ham_wordcount[word] = count
 						zerospam += 1
 				for word, count in wordcount.items():
 					if word in safe_words:
-						safe_prob *= (count+1) / (saf_mail01+(total*2))
-						safe_wordcount[word] += count
+						safe_prob *= (safe_wordcount[word]+1) / (saf_mail01+len(safe_words))
+						# safe_wordcount[word] += count
 					elif word in common_words:
-						safe_prob *= (count+1) / (com_words01+(total*2))
+						safe_prob *= (comword_wordcount[word]+1) / (com_words01+len(common_words))
 					elif word not in common_words and word not in safe_words:
-						safe_prob *= (count+1) / (saf_mail01+(total*2))
-						safe_wordcount[word] = count
+						safe_prob *= 1 / (saf_mail01+len(safe_words))
+						# safe_wordcount[word] = count
 						zerosafe += 1
 
 				# spam_prob *= spamclass_prob
@@ -215,6 +229,7 @@ for files in toclass:
 				dsaf_mail += 1
 				g = open(gpath)
 				for line2 in g:
+					print("read one line - classify")
 					for word in g.read().split():
 						if word not in words:
 							wordcount[word] = 1
@@ -231,23 +246,23 @@ for files in toclass:
 				zerosafe = 0  #number of words that did not exist as safe word
 				for word, count in wordcount.items():
 					if word in spam_words:
-						spam_prob *= (count+1) / (spm_mail01+(total*2))
-						ham_wordcount[word] += count
+						spam_prob *= (ham_wordcount[word]+1) / (spm_mail01+len(spam_words))
+						# ham_wordcount[word] += count
 					elif word in common_words:
-						spam_prob *= (count+1) / (com_words01+(total*2))
+						spam_prob *= (comword_wordcount[word]+1) / (com_words01+len(common_words))
 					elif word not in common_words and word not in spam_words:
-						spam_prob *= (count+1) / (spm_mail01+(total*2))
-						ham_wordcount[word] = count
+						spam_prob *= 1 / (spm_mail01+len(spam_words))
+						# ham_wordcount[word] = count
 						zerospam += 1
 				for word, count in wordcount.items():
 					if word in safe_words:
-						safe_prob *= (count+1) / (saf_mail01+(total*2))
-						safe_wordcount[word] += count
+						safe_prob *= (safe_wordcount[word]+1) / (saf_mail01+len(safe_words))
+						# safe_wordcount[word] += count
 					elif word in common_words:
-						safe_prob *= (count+1) / (com_words01+(total*2))
+						safe_prob *= (comword_wordcount[word]+1) / (com_words01+len(common_words))
 					elif word not in common_words and word not in safe_words:
-						safe_prob *= (count+1) / (saf_mail01+(total*2))
-						safe_wordcount[word] = count
+						safe_prob *= 1 / (saf_mail01+len(safe_words))
+						# safe_wordcount[word] = count
 						zerosafe += 1
 
 				# spam_prob *= spamclass_prob
@@ -264,21 +279,28 @@ for files in toclass:
 				results.write("number of words with zero probability in safe list: " + str(zerosafe) + "\n")
 				results.write("\n")
 
-		for word in spam_words:
-			for common in safe_words:
-				if word == common and common not in common_words:
-					spam_words.remove(common)
-					safe_words.remove(common)
-					comword_wordcount[common] = 0
-					comword_wordcount[common] += ham_wordcount[common]
-					del ham_wordcount[common]
-					comword_wordcount[common] += safe_wordcount[common]
-					del safe_wordcount[common]
-					common_words.append(common)
-				elif word == common and common in common_words:
-					comword_wordcount[common] += 1
+			print("creating common words list")
+			for word in spam_words:
+				for common in safe_words:
+					if word == common and common not in common_words:
+						spam_words.remove(common)
+						safe_words.remove(common)
+						comword_wordcount[common] = 0
+						comword_wordcount[common] += ham_wordcount[common]
+						del ham_wordcount[common]
+						comword_wordcount[common] += safe_wordcount[common]
+						del safe_wordcount[common]
+						common_words.append(common)
+					elif word == common and common in common_words:
+						spam_words.remove(common)
+						safe_words.remove(common)
+						comword_wordcount[common] += ham_wordcount[common]
+						del ham_wordcount[common]
+						comword_wordcount[common] += safe_wordcount[common]
+						del safe_wordcount[common]
+						comword_wordcount[common] += 1
 
-		com_words01 = len(common_words)
+			com_words01 = len(common_words)
 
 # results.write("found a total of " + str(spm_words01) + " in " + args['starting'] + " within spam emails\n")
 # results.write("found a total of " + str(saf_words01) + " in " + args['starting'] + " within safe emails\n")
