@@ -192,21 +192,33 @@ for files in toclass:
 				zerospam = 0  #number of words that did not exist as spam word
 				zerosafe = 0  #number of words that did not exist as safe word
 				for word, count in wordcount.items():
-					if word in spam_words:
-						spam_prob *= (ham_wordcount[word]+1) / (spm_mail01+len(spam_words))
+					if word in spam_words and count >= 1:
+						i = 0
+						while i < count:
+							spam_prob *= (ham_wordcount[word]+1) / (spm_mail01+len(spam_words))
+							i += 1
 						# ham_wordcount[word] += count
-					elif word in common_words:
-						spam_prob *= (comword_wordcount[word]+1) / (com_words01+len(common_words))
+					elif word in common_words and count >= 1:
+						i = 0
+						while i < count:
+							spam_prob *= (comword_wordcount[word]+1) / (com_words01+len(common_words))
+							i += 1
 					elif word not in common_words and word not in spam_words:
 						spam_prob *= 1 / (spm_mail01+len(spam_words))
 						# ham_wordcount[word] = count
 						zerospam += 1
 				for word, count in wordcount.items():
-					if word in safe_words:
-						safe_prob *= (safe_wordcount[word]+1) / (saf_mail01+len(safe_words))
+					if word in safe_words and count >= 1:
+						i = 0
+						while i < count:
+							safe_prob *= (safe_wordcount[word]+1) / (saf_mail01+len(safe_words))
+							i += 1
 						# safe_wordcount[word] += count
 					elif word in common_words:
-						safe_prob *= (comword_wordcount[word]+1) / (com_words01+len(common_words))
+						i = 0
+						while i < count:
+							safe_prob *= (comword_wordcount[word]+1) / (com_words01+len(common_words))
+							i += 1
 					elif word not in common_words and word not in safe_words:
 						safe_prob *= 1 / (saf_mail01+len(safe_words))
 						# safe_wordcount[word] = count
@@ -245,21 +257,33 @@ for files in toclass:
 				zerospam = 0  #number of words that did not exist as spam word
 				zerosafe = 0  #number of words that did not exist as safe word
 				for word, count in wordcount.items():
-					if word in spam_words:
-						spam_prob *= (ham_wordcount[word]+1) / (spm_mail01+len(spam_words))
+					if word in spam_words and count >= 1:
+						i = 0
+						while i < count:
+							spam_prob *= (ham_wordcount[word]+1) / (spm_mail01+len(spam_words))
+							i += 1
 						# ham_wordcount[word] += count
-					elif word in common_words:
-						spam_prob *= (comword_wordcount[word]+1) / (com_words01+len(common_words))
+					elif word in common_words and count >= 1:
+						i = 0
+						while i < count:
+							spam_prob *= (comword_wordcount[word]+1) / (com_words01+len(common_words))
+							i += 1
 					elif word not in common_words and word not in spam_words:
 						spam_prob *= 1 / (spm_mail01+len(spam_words))
 						# ham_wordcount[word] = count
 						zerospam += 1
 				for word, count in wordcount.items():
-					if word in safe_words:
-						safe_prob *= (safe_wordcount[word]+1) / (saf_mail01+len(safe_words))
+					if word in safe_words and count >= 1:
+						i = 0
+						while i < count:
+							safe_prob *= (safe_wordcount[word]+1) / (saf_mail01+len(safe_words))
+							i += 1
 						# safe_wordcount[word] += count
 					elif word in common_words:
-						safe_prob *= (comword_wordcount[word]+1) / (com_words01+len(common_words))
+						i = 0
+						while i < count:
+							safe_prob *= (comword_wordcount[word]+1) / (com_words01+len(common_words))
+							i += 1
 					elif word not in common_words and word not in safe_words:
 						safe_prob *= 1 / (saf_mail01+len(safe_words))
 						# safe_wordcount[word] = count
